@@ -9,29 +9,25 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Config struct {
-	DB *sqlx.DB
-}
+var DB *sqlx.DB
 
-func NewConfig() (*Config, error) {
+func NewConfig() error {
 	db, err := sqlx.Connect("postgres", "user=ql_user password=graphql dbname=sampledb sslmode=disable")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &Config{
-		DB: db,
-	}, nil
+	DB = db
+	return nil
 }
 
 func main() {
-	c, err := NewConfig()
-	if err != nil {
+	if err := NewConfig(); err != nil {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
 
-	if err := c.DB.Ping(); err != nil {
+	if err := DB.Ping(); err != nil {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	} else {
